@@ -2,7 +2,7 @@
 This library provide communication between your Java application and Arduino controller thought serial port.
 
 #### Maven dependences
-If you use Maven, you can add dependences through [Jitpack](https://jitpack.io/#Kirill26-07-92/arduino/master-SNAPSHOT),
+If you use Maven or Gradle, you can add dependences through [Jitpack](https://jitpack.io/#Kirill26-07-92/arduino/master-SNAPSHOT),
 Or add .jar in your project.
 
 ### How to use?
