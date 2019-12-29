@@ -13,14 +13,13 @@ public class Arduino<T> {
 
     private SerialPort comPort;
     private String portDescription;
-    private int baud_rate;
+    private int baudRate;
 
     /**
      * Empty constructor to be used only if port is unknown and it is imperative to initialise object.
      * If this constructor is called, then calling setPortDescription(String portDescription) is essential to set the serial port.
      */
     public Arduino() {
-        //empty constructor if port undecided
     }
 
     /**
@@ -32,7 +31,6 @@ public class Arduino<T> {
      *                        For Linux and MAC  /dev/cu.usbmodem1411
      */
     public Arduino(final String portDescription) {
-        //make sure to set baud rate after
         this.portDescription = portDescription;
         comPort = SerialPort.getCommPort(this.portDescription);
     }
@@ -44,17 +42,16 @@ public class Arduino<T> {
      *
      * @param portDescription your serial port through Arduino is connected with your computer
      *                        It may write how:
-     *                        For Windows  "COM52";
-     *                        For Linux and MAC  /dev/cu.usbmodem1411
-     * @param baud_rate sets the baud rate for the serial communication.
+     *                        For Windows -  "COM52";
+     *                        For Linux and MAC -  /dev/cu.usbmodem1411
+     * @param baudRate sets the baud rate for the serial communication.
      *                  For Example 9600. You must use baud rate similar of your arduino sketch.
      */
-    public Arduino(final String portDescription, final int baud_rate) {
-        //preferred constructor
+    public Arduino(final String portDescription, final int baudRate) {
         this.portDescription = portDescription;
         comPort = SerialPort.getCommPort(this.portDescription);
-        this.baud_rate = baud_rate;
-        comPort.setBaudRate(this.baud_rate);
+        this.baudRate = baudRate;
+        comPort.setBaudRate(this.baudRate);
     }
 
     /**
@@ -66,7 +63,6 @@ public class Arduino<T> {
      */
     public boolean openConnection() {
         if (comPort.openPort()) {
-
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -74,7 +70,10 @@ public class Arduino<T> {
             }
             return true;
         } else {
-            AlertBox alert = new AlertBox(new Dimension(400,100),"Error Connecting", "Try Another port");
+            final AlertBox alert = new AlertBox(
+                    new Dimension(400,100),
+                    "Error Connecting",
+                    "Try Another port");
             alert.display();
             return false;
         }
@@ -100,11 +99,11 @@ public class Arduino<T> {
     /**
      * Sets the baud rate for serial
      *
-     * @param baud_rate baud of rate. You must use baud rate similar of your arduino sketch.
+     * @param baudRate baud of rate. You must use baud rate similar of your arduino sketch.
      */
-    public void setBaudRate(final int baud_rate) {
-        this.baud_rate = baud_rate;
-        comPort.setBaudRate(this.baud_rate);
+    public void setBaudRate(final int baudRate) {
+        this.baudRate = baudRate;
+        comPort.setBaudRate(this.baudRate);
     }
 
     /**
@@ -130,16 +129,15 @@ public class Arduino<T> {
      * @return all of the data as a string.
      */
     public String serialRead() {
-        //will be an infinite loop if incoming data is not bound
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        StringBuilder out = new StringBuilder();
-        Scanner in = new Scanner(comPort.getInputStream());
+        final StringBuilder input = new StringBuilder();
+        final Scanner scanner = new Scanner(comPort.getInputStream());
 
-        while (in.hasNext()) {
-            out.append(in.next()).append("\n");
+        while (scanner.hasNext()) {
+            input.append(scanner.next()).append("\n");
         }
-        in.close();
-        return out.toString();
+        scanner.close();
+        return input.toString();
     }
 
     /**
@@ -150,19 +148,18 @@ public class Arduino<T> {
      * @return input bytes
      */
     public String serialRead(final int limit) {
-        //in case of unlimited incoming data, set a limit for number of readings
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        StringBuilder out = new StringBuilder();
+        final StringBuilder input = new StringBuilder();
 
         int count = 0;
-        Scanner in = new Scanner(comPort.getInputStream());
+        final Scanner scanner = new Scanner(comPort.getInputStream());
 
-        while (count <= limit && in.hasNext()) {
-            out.append(in.next()).append("\n");
+        while (count <= limit && scanner.hasNext()) {
+            input.append(scanner.next()).append("\n");
             count++;
         }
-        in.close();
-        return out.toString();
+        scanner.close();
+        return input.toString();
     }
 
     /**
@@ -173,19 +170,18 @@ public class Arduino<T> {
      * @return input bytes in String array
      */
     public String[] arraySerialRead(final int limit) {
-        //in case of unlimited incoming data, set a limit for number of readings
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        String[] out = new String[limit + 1];
+        final String[] input = new String[limit + 1];
 
         int count = 0;
-        Scanner in = new Scanner(comPort.getInputStream());
+        final Scanner scanner = new Scanner(comPort.getInputStream());
 
-        while (count <= limit && in.hasNext()) {
-            out[count] += (in.next());
+        while (count <= limit && scanner.hasNext()) {
+            input[count] += (scanner.next());
             count++;
         }
-        in.close();
-        return out;
+        scanner.close();
+        return input;
     }
 
     /**
@@ -197,17 +193,17 @@ public class Arduino<T> {
      */
     public byte[] byteSerialRead(final int limit) {
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        byte[] out = new byte[limit + 1];
+        final byte[] input = new byte[limit + 1];
 
         int count = 0;
-        Scanner in = new Scanner(comPort.getInputStream());
+        Scanner scanner = new Scanner(comPort.getInputStream());
 
-        while (count <= limit && in.hasNext()) {
-            out[count] = in.nextByte();
+        while (count <= limit && scanner.hasNext()) {
+            input[count] = scanner.nextByte();
             count++;
         }
-        in.close();
-        return out;
+        scanner.close();
+        return input;
     }
 
     /**
@@ -216,7 +212,6 @@ public class Arduino<T> {
      * @param s output String value
      */
     public void serialWrite(final T s) {
-        //writes the entire string at once.
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 
         try {
@@ -225,23 +220,22 @@ public class Arduino<T> {
             e.printStackTrace();
         }
 
-        PrintWriter pout = new PrintWriter(comPort.getOutputStream());
-        pout.print(s);
-        pout.flush();
+        final PrintWriter output = new PrintWriter(comPort.getOutputStream());
+        output.print(s);
+        output.flush();
     }
 
     /**
      * Writes the contents of the strings to the serial gradually.
-     * It writes the string in incremental steps with 'noOfChars' characters each time, with a pause of 'delay' milliseconds between each write.
+     * It writes the string in incremental steps with 'numberOfChars' characters each time, with a pause of 'delay' milliseconds between each write.
      * Written as string to serial.
      * Recommended to write String.
      *
-     * @param s output String value.
-     * @param noOfChars incremental steps.
+     * @param data output String value.
+     * @param numberOfChars incremental steps.
      * @param delay pause in milliseconds between each write.
      */
-    public void stringSerialWrite(final String s, final int noOfChars, final int delay) {
-        //writes the entire string at once.
+    public void stringSerialWrite(final String data, final int numberOfChars, final int delay) {
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 
         try {
@@ -250,12 +244,13 @@ public class Arduino<T> {
             e.printStackTrace();
         }
 
-        PrintWriter pout = new PrintWriter(comPort.getOutputStream());
+        final PrintWriter output = new PrintWriter(comPort.getOutputStream());
 
-        for (int i = 0; i < s.length(); i += noOfChars) {
-            pout.write(s.substring(i,i+noOfChars));
-            pout.flush();
-            System.out.println(s.substring(i, i + noOfChars));
+        for (int i = 0; i < data.length(); i += numberOfChars) {
+            final String writingData = data.substring(i, i + numberOfChars);
+            output.write(writingData);
+            output.flush();
+            System.out.println(writingData);
 
             try {
                 Thread.sleep(delay);
@@ -263,17 +258,16 @@ public class Arduino<T> {
                 e.printStackTrace();
             }
         }
-        pout.write(noOfChars);
-        pout.flush();
+        output.write(numberOfChars);
+        output.flush();
     }
 
     /**
      * Writes the individual char to the serial in data type char.
      *
-     * @param c output char value
+     * @param data output char value
      */
-    public void charSerialWrite(final char c) {
-        //writes the entire string at once.
+    public void charSerialWrite(final char data) {
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 
         try {
@@ -282,20 +276,19 @@ public class Arduino<T> {
             e.printStackTrace();
         }
 
-        PrintWriter pout = new PrintWriter(comPort.getOutputStream());
-        pout.write(c);
-        pout.flush();
+        final PrintWriter output = new PrintWriter(comPort.getOutputStream());
+        output.write(data);
+        output.flush();
     }
 
     /**
      * Writes the individual char to the serial in datatype char and pauses the thread for delay milliseconds after.
      * Recommended to write char.
      *
-     * @param c output char value.
+     * @param data output char value.
      * @param delay pause in milliseconds between each write.
      */
-    public void charSerialWrite(final char c, final int delay) {
-        //writes the entire string at once.
+    public void charSerialWrite(final char data, final int delay) {
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
 
         try {
@@ -304,8 +297,9 @@ public class Arduino<T> {
             e.printStackTrace();
         }
 
-        PrintWriter pout = new PrintWriter(comPort.getOutputStream());pout.write(c);
-        pout.flush();
+        final PrintWriter output = new PrintWriter(comPort.getOutputStream());
+        output.write(data);
+        output.flush();
 
         try {
             Thread.sleep(delay);
@@ -313,4 +307,5 @@ public class Arduino<T> {
             e.printStackTrace();
         }
     }
+
 }

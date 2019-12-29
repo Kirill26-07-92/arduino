@@ -7,27 +7,32 @@ public class AlertBox {
 
     private JFrame alertWindow;
 
-    AlertBox(final Dimension obj, final String title, final String message) {
+    AlertBox(final Dimension dimension, final String title, final String message) {
         alertWindow = new JFrame();
         alertWindow.setTitle(title);
-        alertWindow.setSize(obj);
-        alertWindow.setPreferredSize(obj);
+        alertWindow.setSize(dimension);
+        alertWindow.setPreferredSize(dimension);
         alertWindow.setLayout(new BorderLayout());
         alertWindow.setLocationRelativeTo(null);
 
-        JLabel lblMessage = new JLabel(message, SwingConstants.CENTER);
-        JButton btnOk = new JButton("Ok");
+        final JLabel lblMessage = new JLabel(message, SwingConstants.CENTER);
 
-        btnOk.addActionListener(e -> {
-            alertWindow.setVisible(false);
-            alertWindow.dispose();
-        });
-
-        alertWindow.add(btnOk, BorderLayout.SOUTH);
+        alertWindow.add(initButton(), BorderLayout.SOUTH);
         alertWindow.add(lblMessage, BorderLayout.CENTER);
     }
 
     public void display() {
         alertWindow.setVisible(true);
     }
+
+    private JButton initButton() {
+        final JButton btnOk = new JButton("Ok");
+
+        btnOk.addActionListener(e -> {
+            alertWindow.setVisible(false);
+            alertWindow.dispose();
+        });
+        return btnOk;
+    }
+
 }
